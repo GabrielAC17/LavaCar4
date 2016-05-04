@@ -1,6 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
+#define sprio 7
+typedef int bool;
+#define true 1
+#define false 0
 
 typedef struct {
 	char nome[30];
@@ -8,6 +14,7 @@ typedef struct {
 	char placa[7];
 	unsigned int tipo;
 	int prioridade;
+	bool impresso;
 	/*
 	Significado da posição na variável de serviços (a verificar):
 	posição 0:
@@ -22,8 +29,12 @@ typedef struct {
 }carros;
 
 carros cars[50];
-void menu1(),cadastro(),delCadastros(),prioridades();
+void menu1(),cadastro(),delCadastros(),prioridades(),printCadastro(int posi);
 int pos = 0,i;
+
+time_t now;
+struct tm *now_tm;
+int hour;
 
 int main(){
 	system("clear");
@@ -34,11 +45,20 @@ int main(){
 void menu1(){
 	int opcaoSel1;
 	do{
-		printf("Menu Principal:\n1 - Cadastrar clientes\n2 - Deletar clientes cadastrados\n3 - Ordenar e listar prioridades\n4 - Sair\n");
-		fflush(stdin);
+		now = time(NULL);
+		now_tm = localtime(&now);
+		hour = now_tm->tm_hour;
+
+		printf("Menu Principal:\n1 - Cadastrar clientes\n2 - Deletar clientes cadastrados\n3 - Ordenar/listar prioridades e servicos contratados\n4 - Sair\n");
+		setbuf(stdin, NULL);
 		scanf(" %d",&opcaoSel1);
 		if (opcaoSel1 == 1){
-			cadastro();
+			if (hour < 12)
+				cadastro();
+			else if (hour >= 12){
+				printf("Nao e possível cadastrar mais clientes pois passou do meio dia.\n\n");
+				continue;
+			}
 		}
 		else if (opcaoSel1 == 2){
 			delCadastros();
@@ -54,32 +74,32 @@ void menu1(){
 
 void cadastro(){
 	int repeat;
-	do{
+	do{		
 		system("clear");
 		printf("Digite o nome do cliente:\n");
-		fflush(stdin);
-		getchar();
+		setbuf(stdin, NULL);
 		fgets(cars[pos].nome,30,stdin);
+		cars[pos].nome[strlen(cars[pos].nome)-1] = '\0';
 		//scanf("%s", &cars[pos].nome);
 		
 		system("clear");
 		printf("Digite o telefone do cliente:\n");
-		fflush(stdin);
-		getchar();
+		setbuf(stdin, NULL);
 		fgets(cars[pos].telefone,15,stdin);
+		cars[pos].telefone[strlen(cars[pos].telefone)-1] = '\0';
 		//scanf("%s", &cars[pos].telefone);
 	
 		system("clear");
 		printf("Digite a placa do veiculo:\n");
-		fflush(stdin);
-		getchar();
+		setbuf(stdin, NULL);
 		fgets(cars[pos].placa,7,stdin);
+		cars[pos].placa[strlen(cars[pos].placa)-1] = '\0';
 		//scanf("%s", &cars[pos].placa);
 		do{
 			system("clear");
 			printf("Escolha o tipo do carro do cliente:\n\n");
 			printf("1 - Carro Hatch \n2 - Carro Sedan \n3 - Moto \n4 - Van\n");
-			getchar();
+			setbuf(stdin, NULL);
 			scanf(" %d",&cars[pos].tipo);
 			if (cars[pos].tipo == 1 ||cars[pos].tipo == 2 || cars[pos].tipo == 3 || cars[pos].tipo == 4){
 				break;
@@ -90,7 +110,7 @@ void cadastro(){
 			system("clear");
 			printf("Escolha o tipo de lavagem:\n\n");
 			printf("1 - Lavagem Completa \n2 - Lavagem Ecologica\n");
-			getchar();
+			setbuf(stdin, NULL);
 			scanf(" %d",&cars[pos].servicos[0]);
 			if (cars[pos].servicos[0] == 1 ||cars[pos].servicos[0] == 2){
 				break;
@@ -101,7 +121,7 @@ void cadastro(){
 			system("clear");
 			printf("Deseja aspirador?:\n\n");
 			printf("0 - Não\n1 - Sim\n");
-			getchar();
+			setbuf(stdin, NULL);
 			scanf(" %d",&cars[pos].servicos[1]);
 			if (cars[pos].servicos[1] == 0 ||cars[pos].servicos[1] == 1){
 				break;
@@ -112,15 +132,26 @@ void cadastro(){
 			system("clear");
 			printf("Cliente Cadastrado! Deseja cadastrar mais um?:\n\n");
 			printf("0 - Não\n1 - Sim\n");
-			getchar();
+			setbuf(stdin, NULL);
 			scanf(" %d",&repeat);
 			if (repeat == 0 ||repeat == 1){
 				break;
 			}
 		}while (1);
 
+		cars[pos].prioridade = sprio;
+		if (cars[pos].servicos[0] == 1)	cars[pos].prioridade -= 2;
+		if (cars[pos].servicos[0] == 2)	cars[pos].prioridade += 1;
+		if (cars[pos].servicos[1] == 1)	cars[pos].prioridade -= 1;
+		if (cars[pos].tipo == 1)	cars[pos].prioridade -= 1;
+		if (cars[pos].tipo == 2)	cars[pos].prioridade -= 2;
+		if (cars[pos].tipo == 3)	cars[pos].prioridade += 1;
+		if (cars[pos].tipo == 4)	cars[pos].prioridade -= 4;
+		cars[pos].impresso = false;
+
+		pos++;
 	}while (repeat != 0);
-	pos++;
+	
 }
 
 void delCadastros(){
@@ -128,59 +159,99 @@ void delCadastros(){
 }
 
 void prioridades(){
+	unsigned int listo;
+	int ma, posma;
+	bool noPrioLeft = true,startFlag = false;
+
 	system("clear");
 	if (pos == 0){
 		printf("Nenhum cliente cadastrado.\n");
 	}
 	else{
-		for (i=0;i<pos-1;i++){
-			printf("Nome: %s", cars[i].nome);
-			printf("Telefone: %s", cars[i].telefone);
-			printf("Placa: %s", cars[i].placa);
-			switch (cars[i].tipo){
-				case 1:
-					printf("Carro hatch.\n");
-					break;
-				case 2:
-					printf("Carro sedan.\n");
-					break;
-				case 3:
-					printf("Moto.\n");
-					break;
-				case 4:
-					printf("Van.\n");
-					break;
-				default:
-					printf("Erro ao ler o tipo de veículo.\n");
-					break;
+		do{
+			printf("Deseja listar por maior ou menor prioridade?\n\n");
+			printf("1 - Maior\n2 - Menor\n");
+			setbuf(stdin, NULL);
+			scanf(" %d",&listo);
+			if (listo == 1 ||listo == 2){
+				break;
 			}
-			switch (cars[i].servicos[0]){
-				case 1:
-					printf("Lavagem completa.\n");
-					break;
-				case 2:
-					printf("Lavagem Ecologica.\n");
-					break;
-				default:
-					printf("Erro ao ler o tipo de Lavagem.\n");
-					break;
-			}
+		}while (1);
 
-			switch (cars[i].servicos[1]){
-				case 0:
-					printf("Sem aspirador.\n");
-					break;
-				case 1:
-					printf("Com aspirador.\n");
-					break;
-				default:
-					printf("Erro ao ler o tipo de aspirador.\n");
-					break;
-			}
-			printf("\n\n");
+		if (listo == 1){
+			do{
+				noPrioLeft = true;
+				startFlag = false;
+				for (i=0;i<pos;i++){
+					if (cars[i].impresso == false && startFlag == false){
+						ma = cars[i].prioridade;
+						posma = i;
+						startFlag = true;
+					}
+					if (cars[i].prioridade > ma && cars[i].impresso == false){
+						ma = cars[i].prioridade;
+						posma = i;
+					}
+				}
+				printCadastro(posma);
+				cars[posma].impresso = true;
+				for (i=0;i<pos;i++){
+					if (cars[i].impresso == false){
+						noPrioLeft = false;
+					}
+				}
+			}while (noPrioLeft == false);
 		}
-		//system("read -rsp $'Pressione Enter para continuar...\n'");
+
+		for (i=0;i<pos;i++){
+			printCadastro(i);
+		}
 	} 
-	
-	
+}
+
+void printCadastro(int posi){
+	printf("Nome: %s\n", cars[posi].nome);
+	printf("Telefone: %s\n", cars[posi].telefone);
+	printf("Placa: %s\n", cars[posi].placa);
+	switch (cars[posi].tipo){
+		case 1:
+			printf("Carro hatch.\n");
+			break;
+		case 2:
+			printf("Carro sedan.\n");
+			break;
+		case 3:
+			printf("Moto.\n");
+			break;
+		case 4:
+			printf("Van.\n");
+			break;
+		default:
+			printf("Erro ao ler o tipo de veículo.\n");
+			break;
+	}
+	switch (cars[posi].servicos[0]){
+		case 1:
+			printf("Lavagem completa.\n");
+			break;
+		case 2:
+			printf("Lavagem Ecologica.\n");
+			break;
+		default:
+			printf("Erro ao ler o tipo de Lavagem.\n");
+			break;
+	}
+		switch (cars[posi].servicos[1]){
+		case 0:
+			printf("Sem aspirador.\n");
+			break;
+		case 1:
+			printf("Com aspirador.\n");
+			break;
+		default:
+			printf("Erro ao ler o tipo de aspirador.\n");
+			break;
+	}
+	printf("Prioridade = %d", cars[posi].prioridade);
+	printf("\n\n");
 }
