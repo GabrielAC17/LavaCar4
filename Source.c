@@ -26,6 +26,7 @@ void menu1(),cadastro(),delCadastros(),prioridades();
 int pos = 0,i;
 
 int main(){
+	system("clear");
 	printf("Bem vindo ao Lava Car Tabajara!\n\n\n");
 	menu1();
 }
@@ -33,8 +34,9 @@ int main(){
 void menu1(){
 	int opcaoSel1;
 	do{
-		printf("Menu 1:\n1 - Cadastrar clientes\n2 - Deletar clientes cadastrados\n3 - Ordenar e listar prioridades\n4 - Sair\n");
-		scanf("%d",&opcaoSel1);
+		printf("Menu Principal:\n1 - Cadastrar clientes\n2 - Deletar clientes cadastrados\n3 - Ordenar e listar prioridades\n4 - Sair\n");
+		fflush(stdin);
+		scanf(" %d",&opcaoSel1);
 		if (opcaoSel1 == 1){
 			cadastro();
 		}
@@ -73,36 +75,49 @@ void cadastro(){
 		getchar();
 		fgets(cars[pos].placa,7,stdin);
 		//scanf("%s", &cars[pos].placa);
-		
-		fflush(stdin);
-		getchar();
 		do{
 			system("clear");
 			printf("Escolha o tipo do carro do cliente:\n\n");
-			printf("1 - Carro Hatch \n2 - Carro Sedan \n 3 - Moto \n 4 - Van\n");
-			scanf("%d",&cars[pos].tipo);
-		}while (cars[pos].tipo != 1 ||cars[pos].tipo != 2 || cars[pos].tipo != 3 || cars[pos].tipo != 4);
+			printf("1 - Carro Hatch \n2 - Carro Sedan \n3 - Moto \n4 - Van\n");
+			getchar();
+			scanf(" %d",&cars[pos].tipo);
+			if (cars[pos].tipo == 1 ||cars[pos].tipo == 2 || cars[pos].tipo == 3 || cars[pos].tipo == 4){
+				break;
+			}
+		}while (1);
 		
 		do{
 			system("clear");
 			printf("Escolha o tipo de lavagem:\n\n");
 			printf("1 - Lavagem Completa \n2 - Lavagem Ecologica\n");
-			scanf("%d",&cars[pos].servicos[0]);
-		}while (cars[pos].servicos[0] != 1 ||cars[pos].servicos[0] != 2);
+			getchar();
+			scanf(" %d",&cars[pos].servicos[0]);
+			if (cars[pos].servicos[0] == 1 ||cars[pos].servicos[0] == 2){
+				break;
+			}
+		}while (1);
 
 		do{
 			system("clear");
 			printf("Deseja aspirador?:\n\n");
 			printf("0 - Não\n1 - Sim\n");
-			scanf("%d",&cars[pos].servicos[1]);
-		}while (cars[pos].servicos[1] != 0 ||cars[pos].servicos[1] != 1);
+			getchar();
+			scanf(" %d",&cars[pos].servicos[1]);
+			if (cars[pos].servicos[1] == 0 ||cars[pos].servicos[1] == 1){
+				break;
+			}
+		}while (1);
 
 		do{
 			system("clear");
 			printf("Cliente Cadastrado! Deseja cadastrar mais um?:\n\n");
 			printf("0 - Não\n1 - Sim\n");
-			scanf("%d",&repeat);
-		}while (repeat != 0 ||repeat != 1);
+			getchar();
+			scanf(" %d",&repeat);
+			if (repeat == 0 ||repeat == 1){
+				break;
+			}
+		}while (1);
 
 	}while (repeat != 0);
 	pos++;
@@ -164,7 +179,7 @@ void prioridades(){
 			}
 			printf("\n\n");
 		}
-		system("read -rsp $'Pressione Enter para continuar...\n'");
+		//system("read -rsp $'Pressione Enter para continuar...\n'");
 	} 
 	
 	
