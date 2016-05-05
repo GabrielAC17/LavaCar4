@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #define sprio 7
 typedef int bool;
@@ -9,12 +10,13 @@ typedef int bool;
 #define false 0
 
 typedef struct {
-	char nome[30];
-	char telefone[15];
-	char placa[7];
+	char nome[50];
+	char telefone[20];
+	char placa[12];
 	unsigned int tipo;
 	int prioridade;
 	bool impresso;
+	bool ativo;
 	/*
 	Significado da posição na variável de serviços (a verificar):
 	posição 0:
@@ -29,7 +31,7 @@ typedef struct {
 }carros;
 
 carros cars[50];
-void menu1(),cadastro(),delCadastros(),prioridades(),printCadastro(int posi);
+void menu1(),cadastro(),delCadastros(),prioridades(),printCadastro(int posi), eatExtraInput();
 int pos = 0,i;
 
 time_t now;
@@ -39,12 +41,14 @@ int hour;
 int main(){
 	system("clear");
 	printf("Bem vindo ao Lava Car Tabajara!\n\n\n");
+	sleep(2);
 	menu1();
 }
 
 void menu1(){
 	int opcaoSel1;
 	do{
+		system("clear");
 		now = time(NULL);
 		now_tm = localtime(&now);
 		hour = now_tm->tm_hour;
@@ -53,10 +57,14 @@ void menu1(){
 		setbuf(stdin, NULL);
 		scanf(" %d",&opcaoSel1);
 		if (opcaoSel1 == 1){
-			if (hour < 12)
+			if (hour < 12 && pos <50)
 				cadastro();
 			else if (hour >= 12){
 				printf("Nao e possível cadastrar mais clientes pois passou do meio dia.\n\n");
+				continue;
+			}
+			else if (pos >= 50){
+				printf("Sobrecarga do sistema, voce precisa de tantos clientes assim?\n\n");
 				continue;
 			}
 		}
@@ -78,22 +86,25 @@ void cadastro(){
 		system("clear");
 		printf("Digite o nome do cliente:\n");
 		setbuf(stdin, NULL);
-		fgets(cars[pos].nome,30,stdin);
+		fgets(cars[pos].nome,50,stdin);
 		cars[pos].nome[strlen(cars[pos].nome)-1] = '\0';
+		eatExtraInput();
 		//scanf("%s", &cars[pos].nome);
 		
 		system("clear");
 		printf("Digite o telefone do cliente:\n");
 		setbuf(stdin, NULL);
-		fgets(cars[pos].telefone,15,stdin);
+		fgets(cars[pos].telefone,20,stdin);
 		cars[pos].telefone[strlen(cars[pos].telefone)-1] = '\0';
+		eatExtraInput();
 		//scanf("%s", &cars[pos].telefone);
 	
 		system("clear");
 		printf("Digite a placa do veiculo:\n");
 		setbuf(stdin, NULL);
-		fgets(cars[pos].placa,7,stdin);
+		fgets(cars[pos].placa,12,stdin);
 		cars[pos].placa[strlen(cars[pos].placa)-1] = '\0';
+		eatExtraInput();
 		//scanf("%s", &cars[pos].placa);
 		do{
 			system("clear");
@@ -148,7 +159,7 @@ void cadastro(){
 		if (cars[pos].tipo == 3)	cars[pos].prioridade += 1;
 		if (cars[pos].tipo == 4)	cars[pos].prioridade -= 4;
 		cars[pos].impresso = false;
-
+		cars[pos].ativo = true;
 		pos++;
 	}while (repeat != 0);
 	
@@ -219,7 +230,8 @@ void prioridades(){
 						posma = i;
 					}
 				}
-				printCadastro(posma);
+				if (cars[posma].ativo == true)
+					printCadastro(posma);
 				cars[posma].impresso = true;
 				for (i=0;i<pos;i++){
 					if (cars[i].impresso == false){
@@ -232,6 +244,11 @@ void prioridades(){
 		for (i=0;i<pos;i++){
 			cars[i].impresso = false;
 		}
+
+		printf("\nPressione qualquer tecla para continuar.\n");
+		getchar();
+		getchar();
+		//getchar();
 
 		/*for (i=0;i<pos;i++){
 			printCadastro(i);
@@ -285,4 +302,13 @@ void printCadastro(int posi){
 	}
 	printf("Prioridade = %d", cars[posi].prioridade);
 	printf("\n\n");
+}
+
+void eatExtraInput()
+{
+	int ch;
+	while ((ch = getchar()) != '\n' && ch != EOF){
+		if (ch < 0)
+			exit(EXIT_FAILURE);
+	}
 }
