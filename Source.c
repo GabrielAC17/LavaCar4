@@ -16,6 +16,7 @@ typedef struct {
 	unsigned int tipo;
 	int prioridade;
 	bool impresso;
+	unsigned int id;
 	bool ativo;
 	/*
 	Significado da posição na variável de serviços (a verificar):
@@ -61,10 +62,16 @@ void menu1(){
 				cadastro();
 			else if (hour >= 12){
 				printf("Nao e possível cadastrar mais clientes pois passou do meio dia.\n\n");
+				printf("\nPressione qualquer tecla para continuar.\n");
+				getchar();
+				getchar();
 				continue;
 			}
 			else if (pos >= 50){
 				printf("Sobrecarga do sistema, voce precisa de tantos clientes assim?\n\n");
+				printf("\nPressione qualquer tecla para continuar.\n");
+				getchar();
+				getchar();
 				continue;
 			}
 		}
@@ -160,13 +167,44 @@ void cadastro(){
 		if (cars[pos].tipo == 4)	cars[pos].prioridade -= 4;
 		cars[pos].impresso = false;
 		cars[pos].ativo = true;
+		cars[pos].id = pos;
 		pos++;
 	}while (repeat != 0);
 	
 }
 
 void delCadastros(){
-	
+	unsigned int searchid;
+	if (pos == 0){
+		printf("Nenhum cliente cadastrado.\n");
+		printf("\nPressione qualquer tecla para continuar.\n");
+		getchar();
+		getchar();
+		return;
+	}
+	do{
+		system("clear");
+		printf("Digite o id do cliente do qual deseja excluir:\n");
+		printf("ID's não cadastrados ainda são considerados inválidos.\n");
+		setbuf(stdin, NULL);
+		scanf(" %d",&searchid);
+		printf("\n");
+		if (searchid >= 0 && searchid < pos){
+			break;
+		}
+		else {
+			printf("Valor inválido.\n\n");
+			printf("\nPressione qualquer tecla para continuar.\n");
+			getchar();
+			getchar();
+			return;
+		}
+	}while (1);
+	cars[searchid].ativo = false;
+	printf("\nCliente ID %d excluído.\n", searchid);
+	printf("\nPressione qualquer tecla para continuar.\n");
+	getchar();
+	getchar();
 }
 
 void prioridades(){
@@ -177,6 +215,9 @@ void prioridades(){
 	system("clear");
 	if (pos == 0){
 		printf("Nenhum cliente cadastrado.\n");
+		printf("\nPressione qualquer tecla para continuar.\n");
+		getchar();
+		getchar();
 	}
 	else{
 		do{
@@ -205,7 +246,8 @@ void prioridades(){
 						posma = i;
 					}
 				}
-				printCadastro(posma);
+				if (cars[posma].ativo == true)
+					printCadastro(posma);
 				cars[posma].impresso = true;
 				for (i=0;i<pos;i++){
 					if (cars[i].impresso == false){
@@ -258,7 +300,7 @@ void prioridades(){
 }
 
 void printCadastro(int posi){
-	printf("Nome: %s\n", cars[posi].nome);
+	printf("ID %d - Nome: %s\n", cars[posi].id, cars[posi].nome);
 	printf("Telefone: %s\n", cars[posi].telefone);
 	printf("Placa: %s\n", cars[posi].placa);
 	switch (cars[posi].tipo){
