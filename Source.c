@@ -173,6 +173,7 @@ void prioridades(){
 			printf("1 - Maior\n2 - Menor\n");
 			setbuf(stdin, NULL);
 			scanf(" %d",&listo);
+			printf("\n");
 			if (listo == 1 ||listo == 2){
 				break;
 			}
@@ -203,9 +204,39 @@ void prioridades(){
 			}while (noPrioLeft == false);
 		}
 
+		else if (listo == 2){
+			do{
+				noPrioLeft = true;
+				startFlag = false;
+				for (i=0;i<pos;i++){
+					if (cars[i].impresso == false && startFlag == false){
+						ma = cars[i].prioridade;
+						posma = i;
+						startFlag = true;
+					}
+					if (cars[i].prioridade < ma && cars[i].impresso == false){
+						ma = cars[i].prioridade;
+						posma = i;
+					}
+				}
+				printCadastro(posma);
+				cars[posma].impresso = true;
+				for (i=0;i<pos;i++){
+					if (cars[i].impresso == false){
+						noPrioLeft = false;
+					}
+				}
+			}while (noPrioLeft == false);
+		}
+
 		for (i=0;i<pos;i++){
+			cars[i].impresso = false;
+		}
+
+		/*for (i=0;i<pos;i++){
 			printCadastro(i);
 		}
+		*/
 	} 
 }
 
