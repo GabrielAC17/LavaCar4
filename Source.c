@@ -1,3 +1,9 @@
+/*
+Trabalho de LavaCar equipe 4:
+Gabriel de Andrade Cordeiro
+David Erick Arcari
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -91,7 +97,7 @@ void cadastro(){
 	int repeat;
 	do{		
 		system("clear");
-		printf("Digite o nome do cliente:\n");
+		printf("Digite o nome do cliente (seguido de dois enters):\n");
 		setbuf(stdin, NULL);
 		fgets(cars[pos].nome,50,stdin);
 		cars[pos].nome[strlen(cars[pos].nome)-1] = '\0';
@@ -99,7 +105,7 @@ void cadastro(){
 		//scanf("%s", &cars[pos].nome);
 		
 		system("clear");
-		printf("Digite o telefone do cliente:\n");
+		printf("Digite o telefone do cliente (seguido de dois enters):\n");
 		setbuf(stdin, NULL);
 		fgets(cars[pos].telefone,20,stdin);
 		cars[pos].telefone[strlen(cars[pos].telefone)-1] = '\0';
@@ -107,7 +113,7 @@ void cadastro(){
 		//scanf("%s", &cars[pos].telefone);
 	
 		system("clear");
-		printf("Digite a placa do veiculo:\n");
+		printf("Digite a placa do veiculo (seguido de dois enters):\n");
 		setbuf(stdin, NULL);
 		fgets(cars[pos].placa,12,stdin);
 		cars[pos].placa[strlen(cars[pos].placa)-1] = '\0';
